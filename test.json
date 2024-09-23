@@ -1,0 +1,113 @@
+[
+  {
+  "_id": "66f1848244f3040f1baabe74",
+  "user": {
+  "_id": "66f1817187a52f634afd769f",
+  "username": "prabhat_24",
+  "name": "Kumar_prabhat",
+  "email": "rajputPrabhat",
+  "password": "$2b$10$PRxP/Fuc5mpSu2vZF8PDkuQUwziCJqTe0timbCXM/90U5twMF5BK6",
+  "posts": [
+  "66f1848244f3040f1baabe74"
+  ],
+  "profilepic": "image-1727103951491-180518569.JPG",
+  "__v": 1
+  },
+  "content": "Hey this is prabhat",
+  "likes": [],
+  "date": "2024-09-23T15:08:50.286Z",
+  "__v": 0
+  },
+  {
+  "_id": "66f1857ee91001b896ea44f8",
+  "user": {
+  "_id": "66f184d944f3040f1baabe7c",
+  "username": "Deepu",
+  "name": "Deepak Kumar",
+  "email": "deepakkumarnieit@gmail.com",
+  "password": "$2b$10$yeqsFRnqnZNuhMdLy.ZsneZLq.Ujn2.I4wHTzc4HiRypABh2Qz4Sm",
+  "posts": [
+  "66f1857ee91001b896ea44f8",
+  "66f1a3c681fc40ea77e0c664",
+  "66f1a41c81fc40ea77e0c66c",
+  "66f1a642bbea9f43e3d7f6c7"
+  ],
+  "profilepic": "image-1727104298346-817579223.JPG",
+  "__v": 4
+  },
+  "content": "Now i have to add features where people can see other people post",
+  "likes": [
+  "66f184d944f3040f1baabe7c"
+  ],
+  "date": "2024-09-23T15:13:02.437Z",
+  "__v": 1
+  },
+  {
+  "_id": "66f1a3c681fc40ea77e0c664",
+  "user": {
+  "_id": "66f184d944f3040f1baabe7c",
+  "username": "Deepu",
+  "name": "Deepak Kumar",
+  "email": "deepakkumarnieit@gmail.com",
+  "password": "$2b$10$yeqsFRnqnZNuhMdLy.ZsneZLq.Ujn2.I4wHTzc4HiRypABh2Qz4Sm",
+  "posts": [
+  "66f1857ee91001b896ea44f8",
+  "66f1a3c681fc40ea77e0c664",
+  "66f1a41c81fc40ea77e0c66c",
+  "66f1a642bbea9f43e3d7f6c7"
+  ],
+  "profilepic": "image-1727104298346-817579223.JPG",
+  "__v": 4
+  },
+  "content": "work hard you will achieve everything you want",
+  "likes": [],
+  "date": "2024-09-23T17:22:14.864Z",
+  "__v": 0
+  },
+  {
+  "_id": "66f1a41c81fc40ea77e0c66c",
+  "user": {
+  "_id": "66f184d944f3040f1baabe7c",
+  "username": "Deepu",
+  "name": "Deepak Kumar",
+  "email": "deepakkumarnieit@gmail.com",
+  "password": "$2b$10$yeqsFRnqnZNuhMdLy.ZsneZLq.Ujn2.I4wHTzc4HiRypABh2Qz4Sm",
+  "posts": [
+  "66f1857ee91001b896ea44f8",
+  "66f1a3c681fc40ea77e0c664",
+  "66f1a41c81fc40ea77e0c66c",
+  "66f1a642bbea9f43e3d7f6c7"
+  ],
+  "profilepic": "image-1727104298346-817579223.JPG",
+  "__v": 4
+  },
+  "content": "If you cannot do great things, asdasddo small things in a great way.” .",
+  "likes": [
+  "66f184d944f3040f1baabe7c"
+  ],
+  "date": "2024-09-23T17:23:40.579Z",
+  "__v": 1
+  },
+  {
+  "_id": "66f1a642bbea9f43e3d7f6c7",
+  "user": {
+  "_id": "66f184d944f3040f1baabe7c",
+  "username": "Deepu",
+  "name": "Deepak Kumar",
+  "email": "deepakkumarnieit@gmail.com",
+  "password": "$2b$10$yeqsFRnqnZNuhMdLy.ZsneZLq.Ujn2.I4wHTzc4HiRypABh2Qz4Sm",
+  "posts": [
+  "66f1857ee91001b896ea44f8",
+  "66f1a3c681fc40ea77e0c664",
+  "66f1a41c81fc40ea77e0c66c",
+  "66f1a642bbea9f43e3d7f6c7"
+  ],
+  "profilepic": "image-1727104298346-817579223.JPG",
+  "__v": 4
+  },
+  "content": "dsa",
+  "likes": [],
+  "date": "2024-09-23T17:32:50.230Z",
+  "__v": 0
+  }
+  ]

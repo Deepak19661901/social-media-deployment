@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Similar to Instagram's original font */
+    .instagram-logo {
+      font-family: 'Billabong', cursive;
+      font-size: 2.5rem;
+      background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body>
+  
+  <section class="min-h-screen w-full bg-zinc-700 flex justify-center items-center text-white">
+    <form action="/create" method="post" class="px-10 py-5 flex gap-4 flex-col w-1/4 border-zinc-500  justify-center items-center  p-6 rounded-lg shadow-lg ">
+      <h2 class="instagram-logo text-5xl font-bold">Instgram</h2>
+      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="email" name="email">
+      <input type="text" class="w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="username" name="username">
+      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md  border-zinc-500 " placeholder="name" name="name">
+      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="password" name="password">
+      <button class="bg-blue-500 w-full rounded-md outline-none px-10 py-4">Register Account</button>
+      <span>if You Have Already Register. <a class="text-blue-600" href="/loginuser">Login</a></span>
+    </form>
+  </section>
+
+</body>
+</html>

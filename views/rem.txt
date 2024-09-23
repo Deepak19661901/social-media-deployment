@@ -1,0 +1,7 @@
+
+ <!-- <span class="text-lg font-semibold text-orange-500">@<%=user.username%></span> -->
+
+
+      <!-- <a href="/edit/<%=post._id%>" class="inline-block text-white font-mono px-5 ">Edit</a> -->
+
+
