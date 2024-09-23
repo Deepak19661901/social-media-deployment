@@ -59,16 +59,19 @@
 
   <section class="px-36 py-2 shadow-lg">
     <h2 class="text-2xl font-mono  text-white text-[24px]">Create Post </h2>
-     <form class="flex flex-col " action="/createpost" method="post">
-       <textarea class="px-10 w-96 py-2 rounded-md inline-block resize-none text-white border-none outline-none bg-slate-500 font-mono text-2xl " type="text" placeholder="what's in Your Mind" name="content"></textarea>
-      <button class="inline-block w-40 bg-blue-500 text-white px-5 py-2 mt-2  rounded-md">Create Post</button>
+     <form class="flex flex-col " action="/createpost" method="post" enctype="multipart/form-data" >
+       <input type="file" name="uploadpostimg" class="bg-orange-500 text-white w-96 rounded-md mt-1">
+       <textarea class="px-10 mt-1 w-96 py-2 rounded-md inline-block resize-none text-white border-none outline-none bg-slate-500 font-mono text-2xl " type="text" placeholder="what's in Your Mind" name="content"></textarea>
+      <button class="inline-block w-40 bg-blue-500 text-white px-5 py-2 mt-1  rounded-md">Create Post</button>
      </form>
     <div>
     </div>
   </section>
 
-  <section class="post-section flex gap-4 mt-10 px-36 flex-wrap">
+  <p class="post-section flex gap-2 mt-2 px-36 font-sans text-2xl text-white flex-wrap">My Posts</p>
+  <section class="post-section flex gap-4 mt-5 px-36 flex-wrap">
     <!-- First Post -->
+     
     <% user.posts.reverse().forEach((post)=>{%>
       <div class="users-post bg-zinc-600 text-white shadow-lg rounded-lg p-6 mb-4 w-96">
         <div class="flex items-center space-x-3 mb-4">

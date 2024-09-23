@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser')
 const path = require('path')
 const app = express()
 const upload = require('./config/multerconfig')
-
+const uploadpostimg = require('./config/createpostmulterconfig')
 
 // Set view engine
 app.set('view engine', 'ejs')
@@ -123,14 +123,15 @@ app.get('/profile', isLoggedIn, async (req, res) => {
   res.render('profile', { user: userData })
 })
 
-app.post('/createpost',isLoggedIn,async(req,res)=>{
+app.post('/createpost',uploadpostimg.single('uploadpostimg'),isLoggedIn,async(req,res)=>{
   let user = await userModel.findOne({email:req.user.email})
  
   
   let {content} = req.body
   let post = await postModel.create({  // post create by the user
     user:user._id,
-    content:content
+    content:content,
+    postimg:req.file.filename
   })
   // now add post id of that particular user
   user.posts.push(post._id);
@@ -150,7 +151,7 @@ app.get('/like/:id', isLoggedIn, async (req, res) => {
 
   // Find the post by ID
   const post = await postModel.findOne({ _id: req.params.id }).populate('user');
-
+  
   // Check if the logged-in user has already liked the post
   const likeIndex = post.likes.indexOf(loginUser._id);
 
@@ -219,11 +220,10 @@ app.post('/updateprofilepic', upload.single('image'),isLoggedIn, async (req, res
 // allpost
 
 app.get('/allpost',isLoggedIn,async(req,res)=>{
-
    const loginUser = await userModel.findOne({email:req.user.email})
   //  console.log(user)
-  
    const allpost = await postModel.find().populate('user');
+   console.log(allpost)
    res.render('allpost',{allpost,loginUser})
 })
 
