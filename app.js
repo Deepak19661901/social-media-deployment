@@ -1,232 +1,230 @@
-const express = require('express')
-const userModel = require('./models/user')
-const postModel = require('./models/post')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-const cookieParser = require('cookie-parser')
-const path = require('path')
-const app = express()
-const upload = require('./config/multerconfig')
-const uploadpostimg = require('./config/createpostmulterconfig')
+const express = require('express');
+const userModel = require('./models/user');
+const postModel = require('./models/post');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const path = require('path');
+const app = express();
+const upload = require('./config/multerconfig');
+const uploadpostimg = require('./config/createpostmulterconfig');
 
 // Set view engine
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
 // Middleware
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
-app.use(express.static(path.join(__dirname,'public')))
-
-// API
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Home route
 app.get('/', (req, res) => {
-  res.render('index')
-})
+  res.render('index');
+});
 
 // Create user
 app.post('/create', async (req, res) => {
-  let { username, name, email, password } = req.body
-  let user = await userModel.findOne({ email })
+  let { username, name, email, password } = req.body;
+  let user = await userModel.findOne({ email });
 
-  // User is already created
-  if (user) return res.send('User already created')
+  if (user) return res.send('User already created');
 
   bcrypt.genSalt(10, (err, salt) => {
-    if (err) return res.send('Error while generating salt', err.message)
+    if (err) return res.send('Error while generating salt', err.message);
     
     bcrypt.hash(password, salt, async (err, hash) => {
-      if (err) return res.send('Something went wrong')
-      
-      let createdUser = await userModel.create({
-        email: email,
-        password: hash,
-        username: username,
-        name: name
-      })
+      if (err) return res.send('Something went wrong');
 
-      const token = jwt.sign({ email: email, username: username }, 'secret-key', {
-        expiresIn: '1d' // Token expires in 1 day
-      })
+      let createdUser = await userModel.create({
+        email,
+        password: hash,
+        username,
+        name
+      });
+
+      const token = jwt.sign({ email, username }, 'secret-key', {
+        expiresIn: '1d'
+      });
 
       res.cookie('token', token, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000, // 1 day
         sameSite: 'strict'
-      })
+      });
 
-      // Redirect to profile after creating the user
-      res.redirect('/profile')
-    })
-  })
-})
+      res.redirect('/profile');
+    });
+  });
+});
 
 // Render login form
 app.get('/loginuser', (req, res) => {
-  res.render('login')
-})
+  res.render('login');
+});
 
 // Login user
 app.post('/profile', async (req, res) => {
-  let { email, password } = req.body
-  let user = await userModel.findOne({ email })
+  let { email, password } = req.body;
+  let user = await userModel.findOne({ email });
 
-  if (!user) return res.redirect('/')
+  if (!user) return res.redirect('/');
 
   bcrypt.compare(password, user.password, (err, result) => {
-    if (err) return res.send('Something went wrong')
-    if (!result) return res.send('Invalid credentials')
+    if (err) return res.send('Something went wrong');
+    if (!result) return res.send('Invalid credentials');
 
-    const token = jwt.sign({ email: email }, 'secret-key', {
+    const token = jwt.sign({ email }, 'secret-key', {
       expiresIn: '1d'
-    })
+    });
 
     res.cookie('token', token, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: 'strict'
-    })
+    });
 
-    // Redirect to profile after login
-    res.redirect('/profile')
-  })
-})
+    res.redirect('/profile');
+  });
+});
 
 // Logout user
 app.get('/logout', (req, res) => {
-  res.clearCookie('token')
-  res.redirect('/')
-})
+  res.clearCookie('token');
+  res.redirect('/');
+});
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
-  const token = req.cookies.token
+  const token = req.cookies.token;
 
   if (!token) {
-    return res.redirect('/loginuser')
+    return res.redirect('/loginuser');
   }
 
-  jwt.verify(token, 'secret-key', async (err, decode) => {
+  jwt.verify(token, 'secret-key', (err, decode) => {
     if (err) {
-      return res.redirect('/loginuser')
+      return res.redirect('/loginuser');
     }
-    req.user = decode // Add user data to request object
-    next()
-  })
-}
+    req.user = decode;
+    next();
+  });
+};
 
 // Profile route
 app.get('/profile', isLoggedIn, async (req, res) => {
-  const userData = await userModel.findOne({ email: req.user.email }).populate("posts")
-  
-  res.render('profile', { user: userData })
-})
+  const userData = await userModel.findOne({ email: req.user.email }).populate('posts');
+  res.render('profile', { user: userData });
+});
 
-app.post('/createpost',uploadpostimg.single('uploadpostimg'),isLoggedIn,async(req,res)=>{
-  let user = await userModel.findOne({email:req.user.email})
- 
-  
-  let {content} = req.body
-  let post = await postModel.create({  // post create by the user
-    user:user._id,
-    content:content,
-    postimg:req.file.filename
-  })
-  // now add post id of that particular user
+// Create post
+app.post('/createpost', uploadpostimg.single('uploadpostimg'), isLoggedIn, async (req, res) => {
+  let user = await userModel.findOne({ email: req.user.email });
+  let { content } = req.body;
+  let post = await postModel.create({
+    user: user._id,
+    content,
+    postimg: req.file.filename
+  });
   user.posts.push(post._id);
   await user.save();
+  res.redirect('/profile');
+});
 
-  res.redirect('/profile')
-
-})
-
-// Logic for the like functionality
-
-
-
+// Like functionality
 app.get('/like/:id', isLoggedIn, async (req, res) => {
-  // Find the logged-in user
   const loginUser = await userModel.findOne({ email: req.user.email });
-
-  // Find the post by ID
   const post = await postModel.findOne({ _id: req.params.id }).populate('user');
-  
-  // Check if the logged-in user has already liked the post
   const likeIndex = post.likes.indexOf(loginUser._id);
 
   if (likeIndex === -1) {
-    // If not liked, add the logged-in user's ID to the likes array
     post.likes.push(loginUser._id);
   } else {
-    // If already liked, remove the user's ID from the likes array
     post.likes.splice(likeIndex, 1);
   }
-
-  // Save the updated post
   await post.save();
+  res.redirect(req.get('referer'));
+});
 
-  // Redirect back to the referrer (page where the request came from)
-  const referer = req.get('referer');
-  if (referer.includes('/allpost')) {
-    res.redirect('/allpost');
-  } else if (referer.includes('/profile')) {
-    res.redirect('/profile');
-  } else {
-    res.redirect('/'); // Fallback redirect
-  }
+// Edit post
+app.get('/edit/:id', isLoggedIn, async (req, res) => {
+  const editPost = await postModel.findOne({ _id: req.params.id });
+  res.render('edit', { editdata: editPost });
+});
+
+app.post('/update/:id', isLoggedIn, async (req, res) => {
+  let { content } = req.body;
+  await postModel.findByIdAndUpdate({ _id: req.params.id }, { content }, { new: true });
+  res.redirect('/profile');
+});
+
+// Edit profile page
+app.get('/editprofile', isLoggedIn, (req, res) => {
+  res.render('editprofile');
+});
+
+// Profile picture upload
+app.post('/updateprofilepic', upload.single('image'), isLoggedIn, async (req, res) => {
+  const user = await userModel.findOne({ email: req.user.email });
+  user.profilepic = req.file.filename;
+  await user.save();
+  res.redirect('/profile');
+});
+
+// View all posts
+app.get('/allpost', isLoggedIn, async (req, res) => {
+  const loginUser = await userModel.findOne({ email: req.user.email });
+  const allpost = await postModel.find().populate('user');
+  res.render('allpost', { allpost, loginUser });
+});
+
+// Add comment
+app.post('/addcomment', isLoggedIn, async (req, res) => {
+  const { comment, postId } = req.body;
+  const loginUser = await userModel.findOne({ email: req.user.email });
+  const newComment = {
+    user: loginUser._id,
+    text: comment,
+  };
+  const post = await postModel.findById(postId);
+  post.comments.push(newComment);
+  await post.save();
+  res.redirect(req.get('referer'));
+});
+
+// Explore page (Follow functionality)
+// Explore page (Follow functionality)
+app.get('/explore', isLoggedIn, async (req, res) => {
+  const email = req.user.email;
+  const loggedInUser = await userModel.findOne({ email });
+  const users = await userModel.find();
+  const filteredUser = users.filter(user => user.email !== email);
+
+  res.render('explore', { users: filteredUser, loggedInUser }); // Pass loggedInUser to the view
 });
 
 
-// Edit logic for the like functionality
-
-app.get('/edit/:id',isLoggedIn,async(req,res)=>{
-    const editPost = await postModel.findOne({_id:req.params.id})
-    res.render('edit',{'editdata':editPost})
-})
-
-app.post('/update/:id',isLoggedIn,async(req,res)=>{
-  let {content} = req.body
-  console.log(req.params.id)
-  console.log(content)
-  await postModel.findByIdAndUpdate({_id:req.params.id},{content:content},{new:true})
-  res.redirect('/profile')
-})
-
-
-// profile  page add
-
-app.get('/editprofile',isLoggedIn,(req,res)=>{
-  res.render('editprofile')
-})
-
-//profile  image pic
-app.post('/updateprofilepic', upload.single('image'),isLoggedIn, async (req, res) => {
+// Follow user
+app.get('/follow/:id', isLoggedIn, async (req, res) => {
   try {
-  
-    // console.log(req.file.filename)
-    const user = await userModel.findOne({ email: req.user.email });
+    const following_ID = req.params.id;
+    const loggedInUser = await userModel.findOne({ email: req.user.email });
+    console.log(loggedInUser)
+    if (loggedInUser.following.includes(following_ID)) {
+      return res.send('You are already following this user');
+    }
+    loggedInUser.following.push(following_ID);
+    await loggedInUser.save();
 
-    user.profilepic = req.file.filename; 
-    
-    await user.save(); 
-    res.redirect('/profile');
+    const followedUser = await userModel.findById(following_ID);
+    followedUser.followers.push(loggedInUser._id);
+    await followedUser.save();
+    res.render('explore');
   } catch (err) {
-    console.error(err);
-    res.status(500).send('An error occurred while uploading the profile picture');
+    res.status(500).send('An error occurred while trying to follow the user');
   }
 });
-
-// allpost
-
-app.get('/allpost',isLoggedIn,async(req,res)=>{
-   const loginUser = await userModel.findOne({email:req.user.email})
-  //  console.log(user)
-   const allpost = await postModel.find().populate('user');
-   console.log(allpost)
-   res.render('allpost',{allpost,loginUser})
-})
 
 app.listen(3000, () => {
-  console.log('Server is connected...')
-})
+  console.log('Server is running on port 3000');
+});

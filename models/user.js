@@ -23,6 +23,20 @@ const userSchema = mongoose.Schema({
       type:String,
       default:'defaultimg.jpg'
     }
+    ,
+    following:[  // Jisko hm follow krte h
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
+      }
+    ]
+    ,
+    followers:[   // jo hmko follow krta hai
+      {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'user'
+      }
+    ]
 
 })
 
