@@ -3,42 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile</title>
+  <title>Edit Profile • Instagram</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Similar to Instagram's original font */
-    .instagram-logo {
-      font-family: 'Billabong', cursive;
-      font-size: 2.5rem;
-      background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-  </style>
-  
 </head>
-<body class="min-h-screen w-full bg-zinc-700">
-  
-  <section class=" text-white">
-    <div class="flex justify-evenly items-center">
-      <h2 class="instagram-logo pt-5  text-4xl font-bold">Instgram</h2>
-      <form action="/logout" method="get">
-        <Button class="font-bold px-4 py-1 mt-3 text-black rounded-md bg-red-400  inline-block text-center"><a href="/logout">Logout</a></Button>
-      </form>
+<body class="bg-gray-900 text-white">
+  <div class="max-w-md mx-auto mt-10 bg-gray-800 p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-semibold mb-6">Edit Profile</h1>
+    <form action="/editprofile" method="POST" enctype="multipart/form-data">
+      <div class="mb-4">
+        <label class="block text-gray-300 text-sm font-bold mb-2" for="name">
+          Name
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 text-white" id="name" type="text" name="name" value="<%= user.name %>">
       </div>
-    <hr class="m-2 h-0.5 bg-black border-0">
-    <div class="px-2 py-5 flex gap-4 justify-evenly items-center">
-     <div class="flex flex-col justify-center items-center gap-2">
-      <form action="/updateprofilepic" method="post" name="avatar" enctype="multipart/form-data">
-        <input type="file" placeholder="Add profile Pic" class="px-3 py-2 w-3/4 bg-white text-black rounded-md mb-2" name="image">
-        <button  class = "font-bold bg-red-600 px-5 py-2 rounded-md">upload Profile Pic</button>
-      </form>
-     </div>
-      
-    </div>
-  </section>
-
-
-
+      <div class="mb-4">
+        <label class="block text-gray-300 text-sm font-bold mb-2" for="bio">
+          Bio
+        </label>
+        <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 text-white" id="bio" name="bio" rows="3"><%= user.bio %></textarea>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-300 text-sm font-bold mb-2" for="profilepic">
+          Profile Picture
+        </label>
+        <input type="file" name="profilepic" id="profilepic" accept="image/*" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 text-white">
+      </div>
+      <div class="flex items-center justify-between">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+          Save Changes
+        </button>
+        <a href="/profile" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
 </body>
 </html>

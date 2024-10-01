@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat with <%= chatPartner.username %> • Instagram</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" type="module"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
+    .instagram-logo {
+      font-family: 'Billabong', cursive;
+      font-size: 2.5rem;
+      background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <a href="/allpost" class="instagram-logo">Instagram</a>
+        <div class="flex items-center space-x-4">
+          <a href="/allpost" class="text-gray-300 hover:text-white"><i class="fas fa-home text-2xl"></i></a>
+          <a href="/explore" class="text-gray-300 hover:text-white"><i class="fas fa-compass text-2xl"></i></a>
+          <a href="/chat-list" class="text-gray-300 hover:text-white"><i class="fas fa-paper-plane text-2xl"></i></a>
+          <a href="/profile" class="text-gray-300 hover:text-white"><i class="fas fa-user-circle text-2xl"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Chat Header -->
+  <div class="bg-gray-800 shadow-md p-4 flex items-center mt-16">
+    <img src="/images/uploads/<%= chatPartner.profilepic %>" alt="<%= chatPartner.username %>" class="w-12 h-12 rounded-full mr-4">
+    <h1 class="text-2xl font-bold"><%= chatPartner.username %></h1>
+  </div>
+
+  <!-- Chat Messages -->
+  <div id="chat-messages" class="flex-grow overflow-y-auto p-4 bg-gray-900">
+    <% chatHistory.forEach(message => { %>
+      <div class="mb-4 flex <%= message.sender.toString() === loggedInUser._id.toString() ? 'justify-end' : 'justify-start' %>">
+        <div class="<%= message.sender.toString() === loggedInUser._id.toString() ? 'bg-blue-600 text-white' : 'bg-gray-700 text-white' %> rounded-lg p-2 max-w-xs">
+          <p><%= message.text %></p>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Message Input -->
+  <div class="bg-gray-800 p-4 flex items-center">
+    <input type="text" id="message-input" class="flex-grow bg-gray-700 text-white border border-gray-600 rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message...">
+    <button id="emoji-button" class="bg-gray-700 p-2 text-2xl rounded-full border-t border-b  border-gray-600">☻</button>
+    <button id="send-button" class="bg-blue-600 text-white rounded-r-lg p-2 hover:bg-blue-700 transition duration-300">Send</button>
+  </div>
+  <emoji-picker id="emoji-picker" style="display: none;"></emoji-picker>
+
+  <script>
+    const socket = io();
+    const chatMessages = document.getElementById('chat-messages');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const emojiButton = document.getElementById('emoji-button');
+    const emojiPicker = document.getElementById('emoji-picker');
+
+    socket.emit('join', { userId: '<%= loggedInUser._id %>', chatPartnerId: '<%= chatPartner._id %>' });
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    emojiButton.addEventListener('click', () => {
+      emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+    });
+
+    emojiPicker.addEventListener('emoji-click', event => {
+      messageInput.value += event.detail.unicode;
+    });
+
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (message) {
+        const messageObj = {
+          sender: '<%= loggedInUser._id %>',
+          receiver: '<%= chatPartner._id %>',
+          text: message
+        };
+        socket.emit('chat message', messageObj);
+        displayMessage(messageObj);
+        messageInput.value = '';
+      }
+    }
+
+    function displayMessage(message) {
+      const messageElement = document.createElement('div');
+      messageElement.classList.add('mb-4', 'flex', message.sender === '<%= loggedInUser._id %>' ? 'justify-end' : 'justify-start');
+      messageElement.innerHTML = `
+        <div class="${message.sender === '<%= loggedInUser._id %>' ? 'bg-blue-500 text-white' : 'bg-gray-300'} rounded-lg p-2 max-w-xs">
+          <p>${message.text}</p>
+        </div>
+      `;
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    socket.on('chat message', (message) => {
+      if (message.sender.toString() !== '<%= loggedInUser._id %>') {
+        displayMessage(message);
+      }
+    });
+
+    // Scroll to bottom of chat on page load
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  </script>
+</body>
+</html>

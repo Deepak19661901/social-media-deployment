@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Profile</title>
+  <title><%= user.username %> • Instagram</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Similar to Instagram's original font */
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -14,120 +15,98 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    .user-card {
+      transition: none;
+    }
   </style>
-  
 </head>
-<body class="min-h-screen w-full bg-zinc-700">
-  
-  <section class=" text-white">
-    <div class="flex justify-evenly items-center">
-     <a href="/allpost"> <h2 class="instagram-logo pt-5  text-4xl font-bold">Instgram</h2></a>
-      <p class="text-2xl pt-5 text-center font-serif">Hello,<%=user.name %>👋</p>
-      <form action="/logout" method="get">
-        <Button class="font-bold px-4 py-1 mt-3 text-black rounded-md bg-red-400  inline-block text-center"><a href="/logout">Logout</a></Button>
-      </form>
-      </div>
-    <hr class="m-2 h-0.5 bg-black border-0">
-    <div class="px-2 py-5 flex gap-4 justify-evenly items-center">
-     <div class="flex flex-col justify-center items-center gap-2">
-      <img class=" rounded-full mt-2 w-40 h-40 object-center  overflow-hidden" src="/images/uploads/<%=user.profilepic%>" alt="">
-      <a href="/editprofile" class="font-bold text-zinc-500">Edit Profile</a>
-
-      <div class="flex flex-col ">
-      <span class="inline-block text-zinc-400 uppercase font-bold text-1xl"><%=user.username %></span>
-      <span class="about-user-work inline-block text-black  font-bold text-1xl">E-commerce Website</span>
-      <span class="about inline-block text-black  font-bold text-1xl">Selective free resuource for designers@deep</span>
-      <span class="location inline-block  text-blue-700  font-medium text-1xl">India,Bihar,Mysore</span>
-      </div>
-     </div>
-      <div class="flex justify-evenly text-2xl font-bold">
-        <p class="flex flex-col justify-center items-center">
-          <span class="inline-block px-3 "><%=user.posts.length%></span>
-          <span class="inline-block px-3">Posts</span>
-        </p>
-        <p class="flex flex-col justify-center items-center">
-          <span class="inline-block px-3 "><%=user.followers.length%></span>
-          <span class="inline-block px-3">followers</span>
-        </p>
-        <p class="flex flex-col justify-center items-center">
-          <span class="inline-block px-3"><%=user.following.length%></span>
-          <span class="inline-block px-3">following</span>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="px-36 py-2 shadow-lg">
-    <h2 class="text-2xl font-mono  text-white text-[24px]">Create Post </h2>
-     <form class="flex flex-col " action="/createpost" method="post" enctype="multipart/form-data" >
-       <input type="file" name="uploadpostimg" class="bg-orange-500 text-white w-96 rounded-md mt-1">
-       <textarea class="px-10 mt-1 w-96 py-2 rounded-md inline-block resize-none text-white border-none outline-none bg-slate-500 font-mono text-2xl " type="text" placeholder="what's in Your Mind" name="content"></textarea>
-      <button class="inline-block w-40 bg-blue-500 text-white px-5 py-2 mt-1  rounded-md">Create Post</button>
-     </form>
-    <div>
-    </div>
-  </section>
-
-  <p class="post-section flex gap-2 mt-2 px-36 font-sans text-2xl text-white flex-wrap">My Posts</p>
-  <section class="post-section flex gap-4 mt-5 px-36 flex-wrap">
-    <!-- First Post -->
-     
-    <% user.posts.reverse().forEach((post)=>{%>
-      <div class="users-post bg-zinc-600 text-white shadow-lg rounded-lg p-6 mb-4 w-96">
-        <div class="flex items-center space-x-3 mb-4">
-          <span class="text-lg font-semibold text-orange-500">@<%=user.username%></span>
+<body class="bg-gray-900 text-white">
+  <!-- Navbar -->
+  <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
+    <div class="max-w-5xl mx-auto px-4">
+      <div class="flex justify-between items-center h-16">
+        <a href="/allpost" class="instagram-logo">Instagram</a>
+        <div class="flex items-center space-x-4">
+          <a href="/allpost" class="text-gray-300 hover:text-white"><i class="fas fa-home text-2xl"></i></a>
+          <a href="/explore" class="text-gray-300 hover:text-white"><i class="fas fa-compass text-2xl"></i></a>
+          <a href="/chat-list" class="text-gray-300 hover:text-white"><i class="fas fa-paper-plane text-2xl"></i></a>
+          <a href="/profile" class="text-gray-300 hover:text-white"><i class="fas fa-user-circle text-2xl"></i></a>
+          <form action="/logout" method="get">
+            <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+          </form>
         </div>
-        <p class="text-gray-300 text-base leading-relaxed">
-          <%=post.content %>
-        </p>
-        <a href="/like/<%=post._id%>" class="inline-block text-orange-500 font-mono" >
-          <%=post.likes.indexOf(user._id)===-1 ?"Like":"unlike"%>
-        </a>
-        <a class="inline-block text-white font-bold"><%=post.likes.length%></a>
-         <a href="/edit/<%=post._id%>" class="inline-block text-white font-mono px-5 ">Edit</a>
       </div>
-    <%}) %>
-  </section>
-  
-  
-  
-  
-   
-  
+    </div>
+  </nav>
 
+  <!-- Profile Header -->
+  <header class="max-w-4xl mx-auto mt-20 px-4 py-8">
+    <div class="flex items-center">
+      <img class="w-32 h-32 rounded-full object-cover mr-8" src="/images/uploads/<%= user.profilepic %>" alt="<%= user.username %>'s profile picture">
+      <div>
+        <h1 class="text-3xl font-light mb-4"><%= user.username %></h1>
+        <div class="flex space-x-8 mb-4">
+          <span><strong><%= user.posts.length %></strong> posts</span>
+          <a href="/followers" class="text-gray-300 hover:text-white"><span><strong><%= user.followers.length %></strong> followers</span></a>
+          <a href="/following" class="text-gray-300 hover:text-white"><span><strong><%= user.following.length %></strong> following</span></a>
+        </div>
+        <h2 class="font-bold"><%= user.name %></h2>
+        <p class="text-gray-400"><%= user.bio || "No bio yet." %></p>
+        <a href="/editprofile" class="mt-2 inline-block bg-gray-700 rounded px-2 py-1 text-sm font-semibold text-gray-300 hover:bg-gray-600">Edit Profile</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Create Post Section -->
+  <section class="max-w-4xl mx-auto mt-8 px-4">
+    <h2 class="text-2xl font-semibold mb-4">Create Post</h2>
+    <form action="/createpost" method="post" enctype="multipart/form-data" class="bg-gray-800 rounded-lg shadow p-6">
+      <div class="mb-4">
+        <label class="block text-gray-300 text-sm font-bold mb-2" for="uploadpostimg">
+          Upload Image
+        </label>
+        <input type="file" name="uploadpostimg" id="uploadpostimg" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 text-white">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-300 text-sm font-bold mb-2" for="content">
+          Caption
+        </label>
+        <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 text-white" id="content" name="content" rows="3" placeholder="What's on your mind?"></textarea>
+      </div>
+      <div class="flex items-center justify-between">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+          Create Post
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Posts Grid -->
+  <section class="max-w-4xl mx-auto mt-8 px-4">
+    <h2 class="text-2xl font-semibold mb-4">Posts</h2>
+    <div class="grid grid-cols-3 gap-4">
+      <% user.posts.reverse().forEach((post) => { %>
+        <div class="relative group">
+          <img src="/images/uploadpostimg/<%= post.postimg %>" alt="Post image" class="w-full h-full object-cover">
+          <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div class="text-white text-center">
+              <span class="mr-4"><i class="fas fa-heart"></i> <%= post.likes.length %></span>
+              <span><i class="fas fa-comment"></i> <%= post.comments.length %></span>
+            </div>
+          </div>
+          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <a href="/edit/<%= post._id %>" class="text-white bg-blue-600 rounded-full p-2 mr-2 hover:bg-blue-700"><i class="fas fa-edit"></i></a>
+            <a href="/deletepost/<%= post._id %>" class="text-white bg-red-600 rounded-full p-2 hover:bg-red-700" onclick="return confirm('Are you sure you want to delete this post?');"><i class="fas fa-trash"></i></a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- Delete Account Button -->
+  <section class="max-w-4xl mx-auto mt-8 px-4 mb-8">
+    <a href="/deleteaccount" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">Delete Account</a>
+  </section>
 
 </body>
 </html>
-
-<!-- <div class="bg-red-300 text-5xl">
-  <h2 class="text-2xl">Profile Page</h2>
-</div> -->
-
-
-<!-- <script>
-  let arr = [1,2,3,4,5,6,];
-  const ele = document.getElementsByClassName('test')[0]
-
-  arr.forEach((val)=>{
-   const div =  `
-    <div class="flex flex-col items-center ">
-      <img class=" w-48 h-48 border-2 border-white" src="https://i.pinimg.com/736x/6e/e1/91/6ee19142a58f28b93766a9f44663a540.jpg" alt="">
-      <span class="inline-block text-blue-50 font-medium ">DesCription : lorem</span>
-      <span  class="font-bold cursor-pointer text-blue-600">like 0</span>
-    </div>
-    `
-    ele.innerHTML+=div
-  })
-  
-</script> -->
-<!-- <section class=" mt-5 px-2 py-5  ">
-    <div class="flex justify-evenly font-bold ">
-      <p class="font-bold text-white text-[20px]">Image</p>
-      <p class="font-bold text-white text-[20px]">Video</p>
-      <p class="font-bold text-white text-[20px]">Tag</p>
-    </div>
-
-    <div class="w-3/4 mx-auto images-deatils px-16 mt-5 flex flex-wrap gap-4 test">
-    </div>
-
-  </section> -->

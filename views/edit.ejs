@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit your post</title>
+  <title>Edit Your Post</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Similar to Instagram's original font */
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
+    /* Instagram-like Logo Style */
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -15,23 +16,33 @@
       -webkit-text-fill-color: transparent;
     }
   </style>
-
 </head>
-<body class="min-h-screen w-full bg-zinc-700">
-  <div class="flex justify-start items-center">
-    <a href="/profile" class="instagram-logo pt-5 px-36 mb-10  text-4xl font-bold">Instgram</a>
-    </div>
+<body class="min-h-screen w-full bg-zinc-700 text-white">
+  <!-- Instagram Logo and Navigation -->
+  <div class="flex justify-start items-center py-5 px-10 lg:px-36">
+    <a href="/profile" class="instagram-logo text-4xl font-bold">Instagram</a>
+  </div>
 
-  <section class="px-36 py-2 ">
-    <h2 class="text-2xl font-mono mb-5  text-white text-[24px]">Edit Post </h2>
-     <form class="flex flex-col " action="/update/<%=editdata._id %>" method="post">
-       <textarea class="px-10 w-96 py-2 rounded-md inline-block resize-none text-white border-none outline-none bg-slate-500 font-mono text-2xl " type="text" placeholder="what's in Your Mind" name="content"><%=editdata.content%></textarea>
-      <button class="inline-block w-40 bg-yellow-500 text-black px-5 py-2 mt-4  rounded-md">Edit Post</button>
-     </form>
-    <div>
-    </div>
+  <!-- Edit Post Section -->
+  <section class="px-10 lg:px-36 py-2">
+    <h2 class="text-2xl font-mono mb-5 text-white">Edit Post</h2>
+    
+    <!-- Edit Post Form -->
+    <form class="flex flex-col" action="/update/<%=editdata._id %>" method="post">
+      <!-- Text Area for Post Content -->
+      <textarea 
+        class="px-4 py-2 w-full lg:w-96 h-32 rounded-md bg-slate-600 text-white border border-gray-500 outline-none resize-none font-mono text-lg" 
+        placeholder="What's on your mind?" 
+        name="content" 
+        required><%= editdata.content %></textarea>
+      
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="w-40 bg-yellow-500 hover:bg-yellow-600 text-black px-5 py-2 mt-4 rounded-md transition duration-300">
+        Edit Post
+      </button>
+    </form>
   </section>
-
 </body>
 </html>
-

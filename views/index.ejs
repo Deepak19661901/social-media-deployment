@@ -6,7 +6,8 @@
   <title>Register</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Similar to Instagram's original font */
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Instagram-like font */
+    
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -17,16 +18,28 @@
   </style>
 </head>
 <body>
-  
+
+  <!-- Registration Form Section -->
   <section class="min-h-screen w-full bg-zinc-700 flex justify-center items-center text-white">
-    <form action="/create" method="post" class="px-10 py-5 flex gap-4 flex-col w-1/4 border-zinc-500  justify-center items-center  p-6 rounded-lg shadow-lg ">
-      <h2 class="instagram-logo text-5xl font-bold">Instgram</h2>
-      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="email" name="email">
-      <input type="text" class="w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="username" name="username">
-      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md  border-zinc-500 " placeholder="name" name="name">
-      <input type="text" class=" w-full bg-transparent border-2 outline-none px-10 py-4 rounded-md border-zinc-500 " placeholder="password" name="password">
-      <button class="bg-blue-500 w-full rounded-md outline-none px-10 py-4">Register Account</button>
-      <span>if You Have Already Register. <a class="text-blue-600" href="/loginuser">Login</a></span>
+    <form action="/create" method="post" class="px-10 py-5 flex gap-4 flex-col w-full md:w-1/3 lg:w-1/4 bg-zinc-800 border-zinc-600 border rounded-lg shadow-lg">
+      <!-- Instagram Logo -->
+      <h2 class="instagram-logo text-5xl font-bold mb-4">Instagram</h2>
+      
+      <!-- Form Inputs -->
+      <input type="email" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Email" name="email" required>
+      <input type="text" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Username" name="username" required>
+      <input type="text" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Full Name" name="name" required>
+      <input type="password" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Password" name="password" >
+      
+      <!-- Submit Button -->
+      <button class="bg-blue-500 w-full rounded-md px-4 py-3 text-white font-bold hover:bg-blue-600 transition">
+        Register Account
+      </button>
+
+      <!-- Redirect to Login -->
+      <span class="text-sm">Already have an account? 
+        <a class="text-blue-400 hover:text-blue-600 transition" href="/loginuser">Login</a>
+      </span>
     </form>
   </section>
 
