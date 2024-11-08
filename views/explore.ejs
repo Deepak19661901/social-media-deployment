@@ -22,20 +22,39 @@
   <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
     <div class="max-w-5xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
-        <a href="/allpost" class="instagram-logo">Instagram</a>
-        <div class="flex items-center space-x-4">
+        <a href="/allpost" class="instagram-logo text-white">Instagram</a>
+        <div class="hidden md:flex items-center space-x-4">
           <a href="/allpost" class="text-gray-300 hover:text-white"><i class="fas fa-home text-2xl"></i></a>
           <a href="/explore" class="text-gray-300 hover:text-white"><i class="fas fa-compass text-2xl"></i></a>
           <a href="/chat-list" class="text-gray-300 hover:text-white"><i class="fas fa-paper-plane text-2xl"></i></a>
           <a href="/profile" class="text-gray-300 hover:text-white"><i class="fas fa-user-circle text-2xl"></i></a>
-          <form action="/logout" method="get">
+          <form action="/logout" method="get" class="inline">
             <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
           </form>
         </div>
+  
+        <!-- Hamburger Menu for Mobile -->
+        <div class="md:hidden">
+          <button id="menu-button" class="text-gray-300 hover:text-white focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden">
+      <div class="flex flex-col space-y-2 px-4 py-2 bg-gray-800 border-t border-gray-700">
+        <a href="/allpost" class="text-gray-300 hover:text-white">Home</a>
+        <a href="/explore" class="text-gray-300 hover:text-white">Explore</a>
+        <a href="/chat-list" class="text-gray-300 hover:text-white">Chat</a>
+        <a href="/profile" class="text-gray-300 hover:text-white">Profile</a>
+        <form action="/logout" method="get" class="inline">
+          <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+        </form>
       </div>
     </div>
   </nav>
-
   <!-- Main Content -->
   <main class="container mx-auto mt-20 px-4 max-w-2xl">
     <h2 class="text-2xl font-bold mb-4">Explore</h2>
@@ -100,6 +119,14 @@
         `)
         .join('');
     }
+
+
+    const menuButton = document.getElementById('menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  menuButton.addEventListener('click', () => {
+    mobileMenu.classList.toggle('hidden');
+  });
   </script>
 </body>
 </html>
