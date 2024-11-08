@@ -1,3 +1,5 @@
+require('dotenv').config()
+const mongoose = require('mongoose')
 const express = require('express');
 const userModel = require('./models/user');
 const postModel = require('./models/post');
@@ -12,10 +14,21 @@ const upload = require('./config/multerconfig');
 const uploadpostimg = require('./config/createpostmulterconfig');
 const crypto = require('crypto');
 const fs = require('fs');
+const { prototype } = require('stream');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+
+
+// DB Connection
+
+
+mongoose.connect(process.env.MONGO_URL).then(() => {
+  console.log("DB is Connected..")
+}).catch((err) => {
+  console.log("Some thing is Wrong while connecting DB ", err.message)
+})
 
 // Set view engine
 app.set('view engine', 'ejs');
@@ -76,7 +89,7 @@ app.post('/create', async (req, res) => {
 
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return res.send('Error while generating salt', err.message);
-    
+
     bcrypt.hash(password, salt, async (err, hash) => {
       if (err) return res.send('Something went wrong');
 
@@ -158,7 +171,7 @@ const isLoggedIn = (req, res, next) => {
 // Profile route
 app.get('/profile', isLoggedIn, async (req, res) => {
   const userData = await userModel.findOne({ email: req.user.email }).populate('posts').populate('followers')
-  .populate('following');
+    .populate('following');
 
   res.render('profile', { user: userData });
 });
@@ -215,14 +228,14 @@ app.post('/editprofile', isLoggedIn, upload.single('profilepic'), async (req, re
   try {
     const { name, bio } = req.body;
     const user = await userModel.findOne({ email: req.user.email });
-    
+
     user.name = name;
     user.bio = bio;
-    
+
     if (req.file) {
       user.profilepic = req.file.filename;
     }
-    
+
     await user.save();
     res.redirect('/profile');
   } catch (err) {
@@ -245,7 +258,7 @@ app.get('/allpost', isLoggedIn, async (req, res) => {
         }
       })
       .sort('-createdAt');
-    
+
     res.render('allpost', { allpost, loginUser });
   } catch (err) {
     console.error(err);
@@ -318,7 +331,7 @@ app.get('/explore', isLoggedIn, async (req, res) => {
 app.get('/followers', isLoggedIn, async (req, res) => {
   try {
     const loggedInUser = await userModel.findOne({ email: req.user.email }).populate('followers');
-    
+
     res.render('followers', {
       followusers: loggedInUser.followers,
       loggedInUser: loggedInUser
@@ -333,7 +346,7 @@ app.get('/followers', isLoggedIn, async (req, res) => {
 app.get('/following', isLoggedIn, async (req, res) => {
   try {
     const loggedInUser = await userModel.findOne({ email: req.user.email }).populate('following');
-    
+
     res.render('following', {
       followingusers: loggedInUser.following,
       loggedInUser: loggedInUser
@@ -350,9 +363,9 @@ app.get('/chat-list', isLoggedIn, async (req, res) => {
     const loggedInUser = await userModel.findOne({ email: req.user.email })
       .populate('followers')
       .populate('following');
-    
+
     const chatUsers = [...loggedInUser.followers, ...loggedInUser.following]
-      .filter((user, index, self) => 
+      .filter((user, index, self) =>
         index === self.findIndex((t) => t._id.toString() === user._id.toString())
       );
 
@@ -409,20 +422,20 @@ app.get('/deletepost/:id', isLoggedIn, async (req, res) => {
     if (!post) {
       return res.status(404).send('Post not found');
     }
-    
+
     const user = await userModel.findOne({ email: req.user.email });
-    
+
     // Check if the logged-in user is the owner of the post
     if (post.user.toString() !== user._id.toString()) {
       return res.status(403).send('You are not authorized to delete this post');
     }
-    
+
     await postModel.findByIdAndDelete(req.params.id);
-    
+
     // Remove the post from the user's posts array
     user.posts = user.posts.filter(postId => postId.toString() !== req.params.id);
     await user.save();
-    
+
     res.redirect('/profile');
   } catch (err) {
     console.error(err);
@@ -434,25 +447,25 @@ app.get('/deletepost/:id', isLoggedIn, async (req, res) => {
 app.get('/deleteaccount', isLoggedIn, async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req.user.email });
-    
+
     // Delete all posts by the user
     await postModel.deleteMany({ user: user._id });
-    
+
     // Remove user from followers and following lists of other users
     await userModel.updateMany(
       { $or: [{ followers: user._id }, { following: user._id }] },
       { $pull: { followers: user._id, following: user._id } }
     );
-    
+
     // Delete the user
     await userModel.findByIdAndDelete(user._id);
-    
+
     res.clearCookie('token');
     res.redirect('/');
   } catch (err) {
     console.error(err);
     res.status(500).send('An error occurred while deleting the account');
-  } 
+  }
 });
 
 // Socket.IO connection handling
@@ -487,6 +500,7 @@ io.on('connection', (socket) => {
 });
 
 // Start the server
-server.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 3000
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
