@@ -37,7 +37,9 @@
 
   <!-- Chat Header -->
   <div class="bg-gray-800 shadow-md p-4 flex items-center mt-16">
-    <img src="/images/uploads/<%= chatPartner.profilepic %>" alt="<%= chatPartner.username %>" class="w-12 h-12 rounded-full mr-4">
+    <img src="<%= chatPartner.profilepic?.url || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s' %>" 
+         alt="<%= chatPartner.username %>" 
+         class="w-12 h-12 rounded-full mr-4">
     <h1 class="text-2xl font-bold"><%= chatPartner.username %></h1>
   </div>
 

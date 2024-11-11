@@ -28,7 +28,28 @@
     <h2 class="text-2xl font-mono mb-5 text-white">Edit Post</h2>
     
     <!-- Edit Post Form -->
-    <form class="flex flex-col" action="/update/<%=editdata._id %>" method="post">
+    <form class="flex flex-col" action="/update/<%= editdata._id %>" method="post" enctype="multipart/form-data">
+      <!-- Current Post Image -->
+      <div class="mb-6">
+        <img 
+          src="<%= editdata.postimg?.url %>" 
+          alt="Current Post Image" 
+          id="preview-image"
+          class="max-w-md rounded-lg shadow-lg mb-4 object-contain h-64"
+          onerror="this.src='/images/default-post.png'"
+        >
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-bold mb-2">
+            Update Image (Optional)
+          </label>
+          <input type="file" 
+                 name="postimg" 
+                 accept="image/*"
+                 onchange="previewImage(this)"
+                 class="w-full px-3 py-2 bg-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-300">
+        </div>
+      </div>
+
       <!-- Text Area for Post Content -->
       <textarea 
         class="px-4 py-2 w-full lg:w-96 h-32 rounded-md bg-slate-600 text-white border border-gray-500 outline-none resize-none font-mono text-lg" 
@@ -40,9 +61,28 @@
       <button 
         type="submit" 
         class="w-40 bg-yellow-500 hover:bg-yellow-600 text-black px-5 py-2 mt-4 rounded-md transition duration-300">
-        Edit Post
+        Save Changes
       </button>
     </form>
+
+    <!-- Back to Profile Link -->
+    <div class="mt-4">
+      <a href="/profile" class="text-blue-400 hover:text-blue-300">Back to Profile</a>
+    </div>
   </section>
+
+  <!-- Add this script -->
+  <script>
+  function previewImage(input) {
+    const preview = document.getElementById('preview-image');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  </script>
 </body>
 </html>

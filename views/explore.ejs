@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
+
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -17,6 +19,7 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-900 text-white">
   <!-- Navbar -->
   <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
@@ -29,10 +32,11 @@
           <a href="/chat-list" class="text-gray-300 hover:text-white"><i class="fas fa-paper-plane text-2xl"></i></a>
           <a href="/profile" class="text-gray-300 hover:text-white"><i class="fas fa-user-circle text-2xl"></i></a>
           <form action="/logout" method="get" class="inline">
-            <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+            <button
+              class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
           </form>
         </div>
-  
+
         <!-- Hamburger Menu for Mobile -->
         <div class="md:hidden">
           <button id="menu-button" class="text-gray-300 hover:text-white focus:outline-none">
@@ -41,7 +45,7 @@
         </div>
       </div>
     </div>
-  
+
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden">
       <div class="flex flex-col space-y-2 px-4 py-2 bg-gray-800 border-t border-gray-700">
@@ -50,7 +54,8 @@
         <a href="/chat-list" class="text-gray-300 hover:text-white">Chat</a>
         <a href="/profile" class="text-gray-300 hover:text-white">Profile</a>
         <form action="/logout" method="get" class="inline">
-          <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+          <button
+            class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
         </form>
       </div>
     </div>
@@ -58,59 +63,82 @@
   <!-- Main Content -->
   <main class="container mx-auto mt-20 px-4 max-w-2xl">
     <h2 class="text-2xl font-bold mb-4">Explore</h2>
-    
+
     <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
       <!-- Search Input -->
       <div class="p-4 border-b border-gray-700">
-        <input id="searchInput" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring focus:border-blue-500 text-white" 
-               type="text" placeholder="Search users" name="user" oninput="filterUsers()">
+        <input id="searchInput"
+          class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring focus:border-blue-500 text-white"
+          type="text" placeholder="Search users" name="user" oninput="filterUsers()">
       </div>
-    
+
       <!-- User List -->
       <div class="userList">
-        <% users.forEach((user) => { %>
+        <% users.forEach((user)=> { %>
           <div class="border-b border-gray-700 flex items-center justify-between p-4">
             <div class="flex items-center space-x-3">
-              <img src="/images/uploads/<%= user.profilepic %>" class="w-10 h-10 rounded-full object-cover" alt="<%= user.username %>'s avatar">
+              <img src="<%= user.profilepic?.url || defaultProfilePic %>" class="w-10 h-10 rounded-full object-center"
+                alt="<%= user.username %>'s avatar">
               <div class="flex flex-col">
-                <span class="font-semibold text-sm"><%= user.username %></span>
-                <span class="text-gray-400 text-sm"><%= user.name %></span>
+                <span class="font-semibold text-sm">
+                  <%= user.username %>
+                </span>
+                <span class="text-gray-400 text-sm">
+                  <%= user.name %>
+                </span>
               </div>
             </div>
-            <a href="/follow/<%= user._id %>">
-              <button class="<%= loggedInUser.following.includes(user._id.toString()) ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700' %> text-white text-sm font-semibold py-1 px-4 rounded-md transition duration-200 ease-in-out">
+            <a href="/follow/<%= user._id %>" class="follow-button">
+              <button
+                class="<%= loggedInUser.following.includes(user._id.toString()) ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700' %> text-white text-sm font-semibold py-1 px-4 rounded-md transition duration-200 ease-in-out">
                 <%= loggedInUser.following.includes(user._id.toString()) ? 'Unfollow' : 'Follow' %>
               </button>
             </a>
           </div>
-        <% }) %>
+          <% }) %>
       </div>
     </div>
   </main>
 
   <script>
+    // Escape HTML to prevent XSS
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     const users = JSON.parse('<%- JSON.stringify(users) %>');
     const loggedInUser = JSON.parse('<%- JSON.stringify(loggedInUser) %>');
+    const defaultProfilePic = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s';
 
     function filterUsers() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       const userList = document.querySelector('.userList');
-      
+
       userList.innerHTML = users
-        .filter(user => 
-          user.username.toLowerCase().includes(searchTerm) || 
+        .filter(user =>
+          user.username.toLowerCase().includes(searchTerm) ||
           user.name.toLowerCase().includes(searchTerm)
         )
         .map(user => `
           <div class="border-b border-gray-700 flex items-center justify-between p-4">
             <div class="flex items-center space-x-3">
-              <img src="/images/uploads/${user.profilepic}" class="w-10 h-10 rounded-full object-cover" alt="${user.username}'s avatar">
+              <img 
+                src="${user.profilepic?.url || defaultProfilePic}" 
+                class="w-10 h-10 rounded-full object-cover" 
+                alt="${escapeHtml(user.username)}'s avatar"
+                onerror="this.src='${defaultProfilePic}'"
+              >
               <div class="flex flex-col">
-                <span class="font-semibold text-sm">${user.username}</span>
-                <span class="text-gray-400 text-sm">${user.name}</span>
+                <span class="font-semibold text-sm">${escapeHtml(user.username)}</span>
+                <span class="text-gray-400 text-sm">${escapeHtml(user.name)}</span>
               </div>
             </div>
-            <a href="/follow/${user._id}">
+            <a href="/follow/${user._id}" class="follow-button">
               <button class="${loggedInUser.following.includes(user._id.toString()) ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm font-semibold py-1 px-4 rounded-md transition duration-200 ease-in-out">
                 ${loggedInUser.following.includes(user._id.toString()) ? 'Unfollow' : 'Follow'}
               </button>
@@ -120,13 +148,13 @@
         .join('');
     }
 
-
     const menuButton = document.getElementById('menu-button');
-  const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-  menuButton.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-  });
+    menuButton.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
   </script>
 </body>
+
 </html>

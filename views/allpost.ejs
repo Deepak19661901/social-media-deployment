@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
+
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -17,13 +19,14 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-900 text-white">
   <!-- Navbar -->
   <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
     <div class="max-w-5xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
         <a href="/allpost" class="instagram-logo text-white">Instagram</a>
-        
+
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-4">
           <a href="/allpost" class="text-gray-300 hover:text-white"><i class="fas fa-home text-2xl"></i></a>
@@ -31,10 +34,11 @@
           <a href="/chat-list" class="text-gray-300 hover:text-white"><i class="fas fa-paper-plane text-2xl"></i></a>
           <a href="/profile" class="text-gray-300 hover:text-white"><i class="fas fa-user-circle text-2xl"></i></a>
           <form action="/logout" method="get" class="inline">
-            <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+            <button
+              class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
           </form>
         </div>
-  
+
         <!-- Hamburger Menu for Mobile -->
         <div class="md:hidden">
           <button id="menu-button" class="text-gray-300 hover:text-white focus:outline-none">
@@ -43,7 +47,7 @@
         </div>
       </div>
     </div>
-  
+
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden">
       <div class="flex flex-col space-y-2 px-4 py-2 bg-gray-800 border-t border-gray-700">
@@ -52,7 +56,8 @@
         <a href="/chat-list" class="text-gray-300 hover:text-white">Chat</a>
         <a href="/profile" class="text-gray-300 hover:text-white">Profile</a>
         <form action="/logout" method="get" class="inline">
-          <button class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
+          <button
+            class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-300">Logout</button>
         </form>
       </div>
     </div>
@@ -61,55 +66,83 @@
 
   <!-- Main Content -->
   <main class="container mx-auto mt-20 px-4 max-w-2xl">
-    <% allpost.forEach((post) => { %>
+    <% allpost.forEach((post)=> { %>
       <div class="bg-gray-800 rounded-lg shadow-lg mb-8">
         <!-- Post Header -->
         <div class="flex items-center p-4">
-          <img src="/images/uploads/<%= post.user.profilepic %>" alt="<%= post.user.username %>" class="w-10 h-10 rounded-full mr-3">
-          <a href="/profile/<%= post.user._id %>" class="font-semibold text-white hover:underline"><%= post.user.username %></a>
+          <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+            <img src="<%= post.user.profilepic?.url || defaultProfilePic %>" alt="Profile picture"
+              class="w-full h-full object-center"
+              onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s'">
+          </div>
+          <span class="font-semibold text-white cursor-default">
+            <%= post.user.username %>
+
+          </span>
         </div>
-        
-        <!-- Post Image -->
-        <img src="/images/uploadpostimg/<%= post.postimg %>" alt="Post image" class="w-full">
-        
+
+        <!-- Post Image Container -->
+        <div class="w-full">
+          <div class="relative w-full max-w-2xl mx-auto">
+            <div class="rounded-lg overflow-hidden bg-gray-800">
+              <img src="<%= post.postimg.url %>" alt="Post image" class="w-full object-contain"
+                style="image-orientation: from-image;" />
+            </div>
+          </div>
+        </div>
+
         <!-- Post Actions -->
         <div class="p-4">
           <div class="flex items-center space-x-4 mb-2">
-            <a href="/like/<%= post._id %>" class="text-2xl <%= post.likes.includes(loginUser._id) ? 'text-red-500' : 'text-gray-300 hover:text-red-500' %>">
+            <a href="/like/<%= post._id %>"
+              class="text-2xl <%= post.likes.includes(loginUser._id) ? 'text-red-500' : 'text-gray-300 hover:text-red-500' %>">
               <i class="fas fa-heart"></i>
             </a>
-            <button class="text-2xl text-gray-300 hover:text-white focus:outline-none" onclick="focusComment('<%= post._id %>')">
+            <button class="text-2xl text-gray-300 hover:text-white focus:outline-none"
+              onclick="focusComment('<%= post._id %>')">
               <i class="fas fa-comment"></i>
             </button>
           </div>
-          <p class="font-semibold"><%= post.likes.length %> likes</p>
+          <p class="font-semibold">
+            <%= post.likes.length %> likes
+          </p>
         </div>
-        
+
         <!-- Post Content -->
         <div class="px-4 pb-2">
-          <p><span class="font-semibold"><%= post.user.username %></span> <%= post.content %></p>
+          <p><span class="font-semibold">
+              <%= post.user.username %>
+            </span>
+            <%= post.content %>
+          </p>
         </div>
-        
+
         <!-- Comments -->
         <div class="px-4 pb-4">
-          <% if (post.comments.length > 0) { %>
+          <% if (post.comments.length> 0) { %>
             <button class="text-gray-400 hover:text-white mb-2" onclick="toggleComments('<%= post._id %>')">
               View all <%= post.comments.length %> comments
             </button>
-          <% } %>
-          <div id="comments-<%= post._id %>" class="hidden space-y-2">
-            <% post.comments.forEach(comment => { %>
-              <p><span class="font-semibold"><%= comment.user.username %></span> <%= comment.text %></p>
-            <% }) %>
-          </div>
-          <form action="/addcomment" method="post" class="mt-2 flex items-center">
-            <input type="hidden" name="postId" value="<%= post._id %>">
-            <input type="text" name="comment" placeholder="Add a comment..." class="flex-grow bg-transparent border-none focus:outline-none text-white" id="comment-<%= post._id %>">
-            <button type="submit" class="ml-2 text-blue-500 font-semibold">Post</button>
-          </form>
+            <% } %>
+              <div id="comments-<%= post._id %>" class="hidden space-y-2">
+                <% post.comments.forEach(comment=> { %>
+                  <p><span class="font-semibold">
+                      <%= comment.user.username %>
+                    </span>
+                    <%= comment.text %>
+                  </p>
+                  <% }) %>
+              </div>
+              <form action="/addcomment" method="post" class="mt-2 flex items-center">
+                <input type="hidden" name="postId" value="<%= post._id %>">
+                <input type="text" name="comment" placeholder="Add a comment..."
+                  class="flex-grow bg-transparent border-none focus:outline-none text-white"
+                  id="comment-<%= post._id %>">
+                <button type="submit" class="ml-2 text-blue-500 font-semibold">Post</button>
+              </form>
         </div>
       </div>
-    <% }) %>
+      <% }) %>
   </main>
 
   <script>
@@ -124,10 +157,11 @@
 
     const menuButton = document.getElementById('menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-  
+
     menuButton.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
     });
   </script>
 </body>
+
 </html>

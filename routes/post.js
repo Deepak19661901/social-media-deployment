@@ -1,0 +1,47 @@
+// Like route
+router.post('/like/:postId', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+    const userId = req.user._id;
+    
+    const liked = post.likes.includes(userId);
+    if (liked) {
+      post.likes.pull(userId);
+    } else {
+      post.likes.push(userId);
+    }
+    
+    await post.save();
+    
+    res.json({
+      liked: !liked,
+      likesCount: post.likes.length
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Comment route
+router.post('/addcomment', async (req, res) => {
+  try {
+    const { postId, comment } = req.body;
+    const post = await Post.findById(postId);
+    
+    const newComment = {
+      user: req.user._id,
+      text: comment
+    };
+    
+    post.comments.push(newComment);
+    await post.save();
+    
+    res.json({
+      postId,
+      username: req.user.username,
+      text: comment
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}); 
