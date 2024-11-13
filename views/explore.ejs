@@ -70,6 +70,10 @@
         <input id="searchInput"
           class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring focus:border-blue-500 text-white"
           type="text" placeholder="Search users" name="user" oninput="filterUsers()">
+        
+        <!-- Add these hidden inputs -->
+        <input type="hidden" id="usersDataInput" value='<%- JSON.stringify(users) %>'>
+        <input type="hidden" id="loggedInUserDataInput" value='<%- JSON.stringify(loggedInUser) %>'>
       </div>
 
       <!-- User List -->
@@ -101,7 +105,6 @@
   </main>
 
   <script>
-    // Escape HTML to prevent XSS
     function escapeHtml(unsafe) {
       return unsafe
         .replace(/&/g, "&amp;")
@@ -111,41 +114,46 @@
         .replace(/'/g, "&#039;");
     }
 
-    const users = JSON.parse('<%- JSON.stringify(users) %>');
-    const loggedInUser = JSON.parse('<%- JSON.stringify(loggedInUser) %>');
+    // Parse the data from hidden inputs
+    const usersData = JSON.parse(document.getElementById('usersDataInput').value);
+    const loggedInUserData = JSON.parse(document.getElementById('loggedInUserDataInput').value);
     const defaultProfilePic = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s';
 
     function filterUsers() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      const userList = document.querySelector('.userList');
+      try {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const userList = document.querySelector('.userList');
 
-      userList.innerHTML = users
-        .filter(user =>
-          user.username.toLowerCase().includes(searchTerm) ||
-          user.name.toLowerCase().includes(searchTerm)
-        )
-        .map(user => `
-          <div class="border-b border-gray-700 flex items-center justify-between p-4">
-            <div class="flex items-center space-x-3">
-              <img 
-                src="${user.profilepic?.url || defaultProfilePic}" 
-                class="w-10 h-10 rounded-full object-cover" 
-                alt="${escapeHtml(user.username)}'s avatar"
-                onerror="this.src='${defaultProfilePic}'"
-              >
-              <div class="flex flex-col">
-                <span class="font-semibold text-sm">${escapeHtml(user.username)}</span>
-                <span class="text-gray-400 text-sm">${escapeHtml(user.name)}</span>
+        userList.innerHTML = usersData
+          .filter(user =>
+            (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+            (user.name && user.name.toLowerCase().includes(searchTerm))
+          )
+          .map(user => `
+            <div class="border-b border-gray-700 flex items-center justify-between p-4">
+              <div class="flex items-center space-x-3">
+                <img 
+                  src="${user.profilepic?.url || defaultProfilePic}" 
+                  class="w-10 h-10 rounded-full object-cover" 
+                  alt="${escapeHtml(user.username)}'s avatar"
+                  onerror="this.src='${defaultProfilePic}'"
+                >
+                <div class="flex flex-col">
+                  <span class="font-semibold text-sm">${escapeHtml(user.username || '')}</span>
+                  <span class="text-gray-400 text-sm">${escapeHtml(user.name || '')}</span>
+                </div>
               </div>
+              <a href="/follow/${user._id}" class="follow-button">
+                <button class="${loggedInUserData.following.includes(user._id.toString()) ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm font-semibold py-1 px-4 rounded-md transition duration-200 ease-in-out">
+                  ${loggedInUserData.following.includes(user._id.toString()) ? 'Unfollow' : 'Follow'}
+                </button>
+              </a>
             </div>
-            <a href="/follow/${user._id}" class="follow-button">
-              <button class="${loggedInUser.following.includes(user._id.toString()) ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700'} text-white text-sm font-semibold py-1 px-4 rounded-md transition duration-200 ease-in-out">
-                ${loggedInUser.following.includes(user._id.toString()) ? 'Unfollow' : 'Follow'}
-              </button>
-            </a>
-          </div>
-        `)
-        .join('');
+          `)
+          .join('');
+      } catch (error) {
+        console.error('Error in filterUsers:', error);
+      }
     }
 
     const menuButton = document.getElementById('menu-button');
