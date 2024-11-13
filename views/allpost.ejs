@@ -94,26 +94,29 @@
         <!-- Post Actions -->
         <div class="p-4">
           <div class="flex items-center space-x-4 mb-2">
-            <a href="/like/<%= post._id %>"
-              class="text-2xl <%= post.likes.includes(loginUser._id) ? 'text-red-500' : 'text-gray-300 hover:text-red-500' %>">
-              <i class="fas fa-heart"></i>
-            </a>
+            <button onclick="handleLike('<%= post._id %>')" class="text-2xl focus:outline-none">
+              <i id="like-icon-<%= post._id %>"
+                class="fas fa-heart <%= post.likes.includes(loginUser._id) ? 'text-red-500' : 'text-gray-300' %>">
+              </i>
+            </button>
             <button class="text-2xl text-gray-300 hover:text-white focus:outline-none"
               onclick="focusComment('<%= post._id %>')">
               <i class="fas fa-comment"></i>
             </button>
           </div>
           <p class="font-semibold">
-            <%= post.likes.length %> likes
+            <span id="likes-count-<%= post._id %>">
+              <%= post.likes.length %>
+            </span> likes
           </p>
         </div>
 
         <!-- Post Content -->
         <div class="px-4 pb-2">
-          <p><span class="font-semibold">
-              <%= post.user.username %>
+          <p><span class="font-semibold text-gray-400">
+              @<%= post.user.username %>
             </span>
-            <%= post.content %>
+            <%= post.user.content %>
           </p>
         </div>
 
@@ -126,14 +129,15 @@
             <% } %>
               <div id="comments-<%= post._id %>" class="hidden space-y-2">
                 <% post.comments.forEach(comment=> { %>
-                  <p><span class="font-semibold">
-                      <%= comment.user.username %>
+                  <p class="text-sm">
+                    <span class="font-semibold">
+                      <%= comment.user.username %>:
                     </span>
-                    <%= comment.text %>
+                    <%= comment.content %>
                   </p>
                   <% }) %>
               </div>
-              <form action="/addcomment" method="post" class="mt-2 flex items-center">
+              <form onsubmit="handleComment(event, '<%= post._id %>')" class="mt-2 flex items-center">
                 <input type="hidden" name="postId" value="<%= post._id %>">
                 <input type="text" name="comment" placeholder="Add a comment..."
                   class="flex-grow bg-transparent border-none focus:outline-none text-white"
@@ -161,6 +165,88 @@
     menuButton.addEventListener('click', () => {
       mobileMenu.classList.toggle('hidden');
     });
+
+    // New function for handling likes
+    async function handleLike(postId) {
+      try {
+        const response = await fetch(`/like/${postId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const likeIcon = document.getElementById(`like-icon-${postId}`);
+          const likesCount = document.getElementById(`likes-count-${postId}`);
+
+          if (data.isLiked) {
+            likeIcon.classList.remove('text-gray-300');
+            likeIcon.classList.add('text-red-500');
+          } else {
+            likeIcon.classList.remove('text-red-500');
+            likeIcon.classList.add('text-gray-300');
+          }
+
+          likesCount.textContent = data.likesCount;
+        }
+      } catch (error) {
+        console.error('Error handling like:', error);
+      }
+    }
+
+    // New function for handling comments
+    async function handleComment(event, postId) {
+      event.preventDefault();
+      const form = event.target;
+      const commentInput = form.querySelector(`#comment-${postId}`);
+      const comment = commentInput.value;
+
+      if (!comment.trim()) return;
+
+      try {
+        const response = await fetch('/addcomment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            postId,
+            comment
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Add new comment to UI
+          const commentsContainer = document.getElementById(`comments-${postId}`);
+          const newCommentElement = document.createElement('p');
+          newCommentElement.className = 'text-sm';
+          newCommentElement.innerHTML = `
+            <span class="font-semibold">${data.username}:</span>
+            ${data.content}
+          `;
+          commentsContainer.appendChild(newCommentElement);
+
+          // Clear input
+          commentInput.value = '';
+
+          // Show comments if hidden
+          commentsContainer.classList.remove('hidden');
+
+          // Update comment count button
+          const commentButton = commentsContainer.previousElementSibling;
+          const commentCount = commentsContainer.children.length;
+          if (commentButton && commentButton.tagName === 'BUTTON') {
+            commentButton.textContent = `View all ${commentCount} comments`;
+          }
+        }
+      } catch (error) {
+        console.error('Error posting comment:', error);
+      }
+    }
   </script>
 </body>
 
