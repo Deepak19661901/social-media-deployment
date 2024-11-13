@@ -1,3 +1,4 @@
+
 require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express');
@@ -189,14 +190,14 @@ app.post('/createpost', isLoggedIn, async (req, res, next) => {
   req.uploadField = 'uploadpostimg';
   handleUpload(req, res, async (err) => {
     if (err) return next(err);
-    
+
     try {
       if (!req.file) {
         return res.status(400).send('Please upload an image');
       }
 
       const user = await User.findOne({ email: req.user.email });
-      
+
       const post = await Post.create({
         user: user._id,
         content: req.body.content,
@@ -220,18 +221,28 @@ app.post('/createpost', isLoggedIn, async (req, res, next) => {
 });
 
 // Like functionality
-app.get('/like/:id', isLoggedIn, async (req, res) => {
-  const loginUser = await User.findOne({ email: req.user.email });
-  const post = await Post.findOne({ _id: req.params.id }).populate('user');
-  const likeIndex = post.likes.indexOf(loginUser._id);
+app.post('/like/:id', isLoggedIn, async (req, res) => {
+  try {
+    const loginUser = await User.findOne({ email: req.user.email });
+    const post = await Post.findOne({ _id: req.params.id }).populate('user');
+    const likeIndex = post.likes.indexOf(loginUser._id);
 
-  if (likeIndex === -1) {
-    post.likes.push(loginUser._id);
-  } else {
-    post.likes.splice(likeIndex, 1);
+    if (likeIndex === -1) {
+      post.likes.push(loginUser._id);
+    } else {
+      post.likes.splice(likeIndex, 1);
+    }
+
+    await post.save();
+
+    res.json({
+      isLiked: likeIndex === -1,
+      likesCount: post.likes.length
+    });
+  } catch (error) {
+    console.error('Like error:', error);
+    res.status(500).json({ error: 'Error processing like' });
   }
-  await post.save();
-  res.redirect(req.get('referer'));
 });
 
 // Edit post
@@ -248,10 +259,10 @@ app.post('/update/:id', isLoggedIn, async (req, res, next) => {
   req.uploadField = 'postimg';
   handleUpload(req, res, async (err) => {
     if (err) return next(err);
-    
+
     try {
       const post = await Post.findById(req.params.id);
-      
+
       // Update content
       post.content = req.body.content;
 
@@ -303,7 +314,7 @@ app.post('/editprofile', isLoggedIn, async (req, res, next) => {
   req.uploadField = 'profilepic';
   handleUpload(req, res, async (err) => {
     if (err) return next(err);
-    
+
     try {
       const user = await User.findOne({ email: req.user.email });
 
@@ -342,7 +353,7 @@ app.get('/allpost', isLoggedIn, async (req, res) => {
   try {
     const loginUser = await User.findOne({ email: req.user.email });
     const allpost = await Post.find()
-      .populate('user', 'username profilepic')
+      .populate('user')
       .populate({
         path: 'comments',
         populate: {
@@ -351,6 +362,8 @@ app.get('/allpost', isLoggedIn, async (req, res) => {
         }
       })
       .sort('-createdAt');
+
+    console.log('First post comments:', allpost[0]?.comments);
 
     res.render('allpost', { allpost, loginUser });
   } catch (err) {
@@ -361,16 +374,37 @@ app.get('/allpost', isLoggedIn, async (req, res) => {
 
 // Add comment
 app.post('/addcomment', isLoggedIn, async (req, res) => {
-  const { comment, postId } = req.body;
-  const loginUser = await User.findOne({ email: req.user.email });
-  const newComment = {
-    user: loginUser._id,
-    text: comment,
-  };
-  const post = await Post.findById(postId);
-  post.comments.push(newComment);
-  await post.save();
-  res.redirect(req.get('referer'));
+  try {
+    const { comment, postId } = req.body;
+
+    if (!comment || !postId) {
+      return res.status(400).json({ error: 'Comment and postId are required' });
+    }
+
+    const loginUser = await User.findOne({ email: req.user.email });
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const newComment = {
+      user: loginUser._id,
+      content: comment
+    };
+
+    post.comments.push(newComment);
+    await post.save();
+
+    // Return the new comment data
+    res.json({
+      username: loginUser.username,
+      content: comment
+    });
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ error: 'Error adding comment' });
+  }
 });
 
 // Follow user
