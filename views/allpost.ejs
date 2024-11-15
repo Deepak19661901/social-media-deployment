@@ -114,9 +114,11 @@
         <!-- Post Content -->
         <div class="px-4 pb-2">
           <p><span class="font-semibold text-gray-400">
-              @<%= post.user.username %>
+              @<%= post.user.username %>:
             </span>
-            <%= post.user.content %>
+            <span class="font-semibold text-gray-400">
+              <%= post.content %>
+            </span>
           </p>
         </div>
 
