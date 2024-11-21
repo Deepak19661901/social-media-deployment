@@ -1,4 +1,3 @@
-
 require('dotenv').config()
 const mongoose = require('mongoose')
 const express = require('express');
@@ -77,6 +76,7 @@ function decrypt(text) {
 }
 
 // Home route
+
 app.get('/', (req, res) => {
   res.render('index');
 });
@@ -176,7 +176,7 @@ app.get('/profile', isLoggedIn, async (req, res) => {
       .populate({
         path: 'posts',
         options: { sort: { 'createdAt': -1 } }
-      });
+      })
 
     res.render('profile', { user });
   } catch (error) {
@@ -224,21 +224,32 @@ app.post('/createpost', isLoggedIn, async (req, res, next) => {
 app.post('/like/:id', isLoggedIn, async (req, res) => {
   try {
     const loginUser = await User.findOne({ email: req.user.email });
-    const post = await Post.findOne({ _id: req.params.id }).populate('user');
-    const likeIndex = post.likes.indexOf(loginUser._id);
+    const post = await Post.findById(req.params.id);
 
-    if (likeIndex === -1) {
-      post.likes.push(loginUser._id);
-    } else {
-      post.likes.splice(likeIndex, 1);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
     }
 
-    await post.save();
+    const isLiked = post.likes.includes(loginUser._id);
+    const updateOperation = isLiked 
+      ? { $pull: { likes: loginUser._id } }
+      : { $push: { likes: loginUser._id } };
+
+    // Use findOneAndUpdate to bypass validation of existing comments
+    await Post.findOneAndUpdate(
+      { _id: req.params.id },
+      updateOperation,
+      { new: true }
+    );
+
+    // Get updated likes count
+    const updatedPost = await Post.findById(req.params.id);
 
     res.json({
-      isLiked: likeIndex === -1,
-      likesCount: post.likes.length
+      isLiked: !isLiked,
+      likesCount: updatedPost.likes.length
     });
+
   } catch (error) {
     console.error('Like error:', error);
     res.status(500).json({ error: 'Error processing like' });
@@ -355,22 +366,27 @@ app.get('/allpost', isLoggedIn, async (req, res) => {
     const allpost = await Post.find()
       .populate('user')
       .populate({
-        path: 'comments',
-        populate: {
-          path: 'user',
-          select: 'username'
-        }
+        path: 'comments.user',
+        select: 'username profilepic'
       })
       .sort('-createdAt');
 
-    console.log('First post comments:', allpost[0]?.comments);
+    // Clean up any null users in comments before sending to template
+    allpost.forEach(post => {
+      post.comments = post.comments.filter(comment => comment.user != null);
+    });
 
-    res.render('allpost', { allpost, loginUser });
+    res.render('allpost', {
+      allpost,
+      loginUser,
+      defaultProfilePic: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s"
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send('An error occurred while loading posts');
   }
 });
+
 
 // Add comment
 app.post('/addcomment', isLoggedIn, async (req, res) => {
@@ -390,16 +406,20 @@ app.post('/addcomment', isLoggedIn, async (req, res) => {
 
     const newComment = {
       user: loginUser._id,
-      content: comment
+      content: comment,
+      createdAt: new Date()
     };
 
     post.comments.push(newComment);
     await post.save();
 
+
     // Return the new comment data
     res.json({
       username: loginUser.username,
-      content: comment
+      content: comment,
+      userId: loginUser._id,
+      createdAt: newComment.createdAt
     });
   } catch (error) {
     console.error('Error adding comment:', error);
@@ -629,27 +649,6 @@ io.on('connection', (socket) => {
 });
 
 // All Posts route (if you don't have this already)
-app.get('/allpost', isLoggedIn, async (req, res) => {
-  try {
-    const posts = await Post.find()
-      .populate('user')
-      .populate({
-        path: 'comments',
-        populate: { path: 'user' }
-      })
-      .sort({ createdAt: -1 });
-
-    const loginUser = await User.findOne({ email: req.user.email });
-    res.render('allpost', {
-      allpost: posts,
-      loginUser,
-      defaultProfilePic: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5x4ugT-l8K56rUtVOPDhJam2Hp5sRLQtyVQ&s"
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error loading posts');
-  }
-});
 
 // User Profile View route
 app.get('/profile/:id', isLoggedIn, async (req, res) => {

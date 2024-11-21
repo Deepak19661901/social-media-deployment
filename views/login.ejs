@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap'); /* Instagram-like font */
-    
+    @import url('https://fonts.googleapis.com/css2?family=Billabong&display=swap');
+   
     .instagram-logo {
       font-family: 'Billabong', cursive;
       font-size: 2.5rem;
@@ -17,20 +18,24 @@
     }
   </style>
 </head>
+
 <body>
-  
+
   <!-- Login Section -->
   <section class="min-h-screen w-full bg-zinc-700 flex justify-center items-center text-white">
-    <form action="/profile" method="post" class="px-10 py-5 flex gap-4 flex-col w-full md:w-1/3 lg:w-1/4 bg-zinc-800 border-zinc-600 border rounded-lg shadow-lg">
-      <!-- Instagram Logo -->
-      <h2 class="instagram-logo text-5xl font-bold mb-6">Instagram</h2>
+    <form action="/profile" method="post"
+      class="px-10 py-5 flex gap-4 flex-col w-full md:w-1/3 lg:w-1/4 bg-zinc-800 border-zinc-600 border rounded-lg shadow-lg">
       
+      <h2 class="instagram-logo text-5xl font-bold mb-6">YaariSpace</h2>
+
       <!-- Email Input -->
-      <input type="email" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Email" name="email" required>
-      
+      <input type="email" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500"
+        placeholder="Email" name="email" required>
+
       <!-- Password Input -->
-      <input type="password" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500" placeholder="Password" name="password" required>
-      
+      <input type="password" class="w-full bg-transparent border-2 outline-none px-4 py-3 rounded-md border-zinc-500"
+        placeholder="Password" name="password" required>
+
       <!-- Login Button -->
       <button class="bg-blue-500 w-full rounded-md px-4 py-3 text-white font-bold hover:bg-blue-600 transition">
         Login Here
@@ -39,4 +44,5 @@
   </section>
 
 </body>
+
 </html>

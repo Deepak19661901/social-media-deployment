@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Instagram Feed</title>
+  <title>YaariSpace Feed</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
@@ -25,7 +25,7 @@
   <nav class="bg-gray-800 border-b border-gray-700 fixed top-0 w-full z-10">
     <div class="max-w-5xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
-        <a href="/allpost" class="instagram-logo text-white">Instagram</a>
+        <a href="/allpost" class="instagram-logo text-white">YaariSapce</a>
 
         <!-- Desktop Menu -->
         <div class="hidden md:flex items-center space-x-4">
@@ -133,7 +133,7 @@
                 <% post.comments.forEach(comment=> { %>
                   <p class="text-sm">
                     <span class="font-semibold">
-                      <%= comment.user.username %>:
+                      <%= comment.user ? comment.user.username : 'Deleted User' %>:
                     </span>
                     <%= comment.content %>
                   </p>
@@ -227,7 +227,7 @@
           const newCommentElement = document.createElement('p');
           newCommentElement.className = 'text-sm';
           newCommentElement.innerHTML = `
-            <span class="font-semibold">${data.username}:</span>
+            <span class="font-semibold">${data.username || 'Unknown User'}:</span>
             ${data.content}
           `;
           commentsContainer.appendChild(newCommentElement);
@@ -238,9 +238,9 @@
           // Show comments if hidden
           commentsContainer.classList.remove('hidden');
 
-          // Update comment count button
-          const commentButton = commentsContainer.previousElementSibling;
+          // Update comment count and button text
           const commentCount = commentsContainer.children.length;
+          const commentButton = commentsContainer.previousElementSibling;
           if (commentButton && commentButton.tagName === 'BUTTON') {
             commentButton.textContent = `View all ${commentCount} comments`;
           }
